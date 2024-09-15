@@ -8,6 +8,7 @@ import Animated, {
   withSequence, 
   withTiming,
   interpolate,
+  Extrapolate,
   Easing,
   useAnimatedScrollHandler
 } from 'react-native-reanimated';
@@ -38,10 +39,10 @@ export function Quiz() {
   const [quiz, setQuiz] = useState<QuizProps>({} as QuizProps);
   const [alternativeSelected, setAlternativeSelected] = useState<null | number>(null);
 
-  const { navigate } = useNavigation();
-
   const shake = useSharedValue(0);
   const scrollY = useSharedValue(0);
+
+  const { navigate } = useNavigation();
 
   const route = useRoute();
   const { id } = route.params as Params;
@@ -88,6 +89,8 @@ export function Quiz() {
     }
 
     setAlternativeSelected(null);
+
+    handleNextQuestion();
   }
 
   function handleStop() {
@@ -133,9 +136,20 @@ export function Quiz() {
     return {
       position: 'absolute',
       paddingTop: 50,
+      zIndex: 1,
       backgroundColor: THEME.COLORS.GREY_500,
-      width: '100%',
-      left: '-5%'
+      width: '110%',
+      left: '-5%',
+      opacity: interpolate( scrollY.value, [50, 90], [0, 10], Extrapolate.CLAMP),
+      transform: [
+        { translateY: interpolate(scrollY.value, [50, 100], [-40, 0], Extrapolate.CLAMP) }
+      ]
+    }
+  })
+
+  const headerStyles = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(scrollY.value, [60, 90], [1, 0], Extrapolate.CLAMP)
     }
   })
 
@@ -144,12 +158,6 @@ export function Quiz() {
     setQuiz(quizSelected);
     setIsLoading(false);
   }, []);
-
-  useEffect(() => {
-    if (quiz.questions) {
-      handleNextQuestion();
-    }
-  }, [points]);
 
   if (isLoading) {
     return <Loading />
@@ -163,18 +171,21 @@ export function Quiz() {
         <Text style={styles.title}>{quiz.title}</Text>
         <ProgressBar total={quiz.questions.length} current={currentQuestion + 1} />
       </Animated.View>
-      
+
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.question}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
       >
-        <QuizHeader
-          title={quiz.title}
-          currentQuestion={currentQuestion + 1}
-          totalOfQuestions={quiz.questions.length}
-        />
+        <Animated.View style={[styles.header, headerStyles]}>
+          <QuizHeader
+            title={quiz.title}
+            currentQuestion={currentQuestion + 1}
+            totalOfQuestions={quiz.questions.length}
+          />
+        </Animated.View>
+        
 
         <Animated.View style={shakeStyleAnimated}>
           <Question
