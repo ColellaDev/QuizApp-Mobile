@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Alert, Text, View } from 'react-native';
+import { OverlayFeedback } from '../../components/OverlayFeedback';
 
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Animated, { 
@@ -198,6 +199,9 @@ export function Quiz() {
 
   return (
     <View style={styles.container}>
+
+      <OverlayFeedback status={0} />
+
       <Animated.View
         style={fixedProgressBarStyles}
       >
