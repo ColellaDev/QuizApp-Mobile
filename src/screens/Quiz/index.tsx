@@ -39,6 +39,7 @@ const CARD_INCLINATION = 10
 const CARD_SKIP_AREA = (-200)
 
 export function Quiz() {
+  const [statusReply, setStatusReply] = useState(0);
   const [points, setPoints] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -90,8 +91,10 @@ export function Quiz() {
     }
 
     if (quiz.questions[currentQuestion].correct === alternativeSelected) {
+      setStatusReply(1);
       setPoints(prevState => prevState + 1);
     } else {
+      setStatusReply(2);
       shakeAnimation();
     }
 
@@ -200,7 +203,7 @@ export function Quiz() {
   return (
     <View style={styles.container}>
 
-      <OverlayFeedback status={0} />
+      <OverlayFeedback status={statusReply} />
 
       <Animated.View
         style={fixedProgressBarStyles}
