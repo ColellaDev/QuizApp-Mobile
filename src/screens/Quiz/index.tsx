@@ -4,6 +4,8 @@ import { OverlayFeedback } from '../../components/OverlayFeedback';
 
 import { Audio } from 'expo-av';
 
+import * as Haptics from 'expo-haptics';
+
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Animated, { 
   useAnimatedStyle, 
@@ -132,7 +134,9 @@ export function Quiz() {
     return true;
   }
 
-  function shakeAnimation() {
+    async function shakeAnimation() {
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+
     shake.value = withSequence(
       withTiming(3, { duration: 400, easing: Easing.bounce }), 
       withTiming(0, undefined, (finished => {
